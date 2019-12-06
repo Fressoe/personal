@@ -1,0 +1,85 @@
+<?php
+session_start();
+require_once('conn.php');
+
+
+
+if(isset($_POST['submit'])){
+
+    $_SESSION['letter'] = $_POST['letter'];
+
+
+    if(isset($_POST['reset'])){
+        $sql = "SELECT * FROM galgje order by rand() LIMIT 1";
+        $result = $conn->query($sql);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $row = mysqli_fetch_assoc($result);
+            $_SESSION['woorden'] = $row['woorden'];
+            $_SESSION['woord-array'] = str_split($row['woord'], 1);
+            unset($_SESSION['guessed_correct']);
+            $_SESSION['guessed_correct'] = array();
+            $trynumber = 10;
+            $_SESSION['trynumber'] = $trynumber;
+        }
+    }
+
+
+
+
+    $lengte = strlen($_SESSION['woorden']);
+
+    $_SESSION['geraden'] = array_fill(0,$lengte,'-');
+    echo'<br>';
+
+
+
+    $pos = strpos($_SESSION['woorden'], $_SESSION['letter']);
+
+    if ($pos == false) {
+        echo 'De '.$_SESSION['letter'].' zit niet in het woord!<br><br>';
+    }
+    else {
+        echo 'De '.$_SESSION['letter']. ' zit wel in het woord!<br><br> Het woord is:'.$_SESSION['woorden'];
+    }
+
+
+    $correct_letter = array($_SESSION['letter']);
+    $word = $_SESSION['woorden'];
+
+    echo '<br><br>';
+
+    foreach(str_split($word,1) as $letter) {
+        if (in_array($letter, $correct_letter, true)) {
+            // $letter toevoegen aan $_SESSION['geraden'] op positie
+            echo $letter;
+
+        } else {
+            foreach ($_SESSION['geraden'] as $value){
+                echo $value;
+            };
+        }
+    }
+}
+
+echo '<br><br>';
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>huiswerk-php</title>
+</head>
+<body>
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+    <input type="text" name="letter" value=''>
+    <input type="submit" name="submit" value="submit">
+    <input type="reset" value="Reset">
+</form>
+</body>
+
+</html>
